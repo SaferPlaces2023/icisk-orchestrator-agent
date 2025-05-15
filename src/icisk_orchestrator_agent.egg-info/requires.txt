@@ -1,0 +1,14 @@
+openai
+langgraph>=0.2.6
+langchain-anthropic
+langchain-openai
+langgraph-cli[inmem]
+nbformat
+python-dateutil
+python-dotenv
+icisk-orchestrator-db@ git+https://github.com/SaferPlaces2023/icisk-orchestrator-db.git
+
+[dev]
+pytest
+black
+mypy

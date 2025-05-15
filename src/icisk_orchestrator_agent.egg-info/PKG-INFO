@@ -1,0 +1,26 @@
+Metadata-Version: 2.4
+Name: icisk-orchestrator-agent
+Version: 0.1.0
+Summary: Langraph AI agent for ICisk-Orchestrator project
+Author-email: Tommaso Redaelli <tommaso.redaelli@gecosistema.com>
+License: MIT
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: openai
+Requires-Dist: langgraph>=0.2.6
+Requires-Dist: langchain-anthropic
+Requires-Dist: langchain-openai
+Requires-Dist: langgraph-cli[inmem]
+Requires-Dist: nbformat
+Requires-Dist: python-dateutil
+Requires-Dist: python-dotenv
+Requires-Dist: icisk-orchestrator-db@ git+https://github.com/SaferPlaces2023/icisk-orchestrator-db.git
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: mypy; extra == "dev"
+Dynamic: license-file
+
+# icisk-orchestrator-agent
+I-Cisk agent packet to be installed in icisk-orchestrator-webapp

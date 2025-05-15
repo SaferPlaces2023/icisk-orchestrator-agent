@@ -1,0 +1,11 @@
+# Vritual environment
+venv/
+
+# Environment variables
+.env
+
+# Test folder
+tests/
+
+# Python cache
+**/__pycache__/
