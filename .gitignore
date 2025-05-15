@@ -9,3 +9,6 @@ tests/
 
 # Python cache
 **/__pycache__/
+
+# Langgraph stuff
+/.langgraph_api/
