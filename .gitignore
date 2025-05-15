@@ -9,6 +9,7 @@ tests/
 
 # Python cache
 **/__pycache__/
+**/*egg-info*/
 
 # Langgraph stuff
 /.langgraph_api/
