@@ -352,6 +352,12 @@ class CDSHistoricNotebookTool(BaseAgentTool):
             "notebook": jupyter_notebook,
         }
         
+    
+    # DOC: Back to a consisent state
+    def _on_tool_end(self):
+        self.execution_confirmed = False
+        self.output_confirmed = True   
+        
         
     # DOC: Try running AgentTool → Will check required, validity and inference over arguments thatn call and return _execute()
     def _run(
