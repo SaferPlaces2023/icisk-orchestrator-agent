@@ -166,15 +166,14 @@ notebook_template.cells.extend([
         # Preprocess period-of-interest dataset
         cds_poi_data = cds_poi_data.drop_vars(['number', 'expver'])
         cds_poi_data = cds_poi_data.rename({'valid_time': 'time', 'latitude': 'lat', 'longitude': 'lon'})
-        cds_poi_data = cds_poi_data.resample(time='1ME').sum()                                      # Resample to monthly total data
-        cds_poi_data = cds_poi_data.assign_coords(time=cds_poi_data.time.dt.strftime('%Y-%m-01'))   # Set month day to 01
-        cds_poi_data = cds_poi_data.assign_coords(time=pd.to_datetime(cds_poi_data.time))
-        cds_poi_data['tp'] = cds_poi_data['tp'] / 12                                                # Convert total precipitation to monthly average precipitation
+        cds_poi_data['time'] = pd.date_range(start=f"{cds_poi_data.time[0].dt.date.item().strftime('%Y-%m-%d')}T01:00:00", periods=len(cds_poi_data.time), freq='h')
+        cds_poi_data = cds_poi_data.sel(time=cds_poi_data.time.dt.hour == 0).resample(time='1ME').sum()
         cds_poi_data = cds_poi_data.assign_coords(
+            time = cds_poi_data.time.to_series().apply(lambda dt: datetime.datetime(dt.year, dt.month, 1)),
             lat=np.round(cds_poi_data.lat.values, 6),
             lon=np.round(cds_poi_data.lon.values, 6),
         )
-        cds_poi_data = cds_poi_data.sortby(['time', 'lat', 'lon'])
+        cds_poi_data = cds_poi_data.sortby(["time", "lat", "lon"])
 
         # Get whole dataset
         ts_dataset = xr.concat([cds_ref_data, cds_poi_data], dim='time')
