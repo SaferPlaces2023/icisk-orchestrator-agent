@@ -126,20 +126,16 @@ class CDSHistoricNotebookTool(BaseAgentTool):
             description = f"The start datetime provided in UTC-0 YYYY-MM-DD. If not specified use {(datetime.datetime.now() - relativedelta.relativedelta(months=2)).strftime('%Y-%m-01')} as default.",
             examples = [
                 None,
-                "2025-01-01",
-                "2025-02-01",
-                "2025-03-10",
+                f"{(datetime.datetime.now() - relativedelta.relativedelta(months=2)).strftime('%Y-%m-01')}"
             ],
             default = None
         )
         end_time: None | str = Field(
             title = "End Time",
-            description = f"The end date provided in UTC-0 YYYY-MM-DD. It must be after the start_time arg. If not specified use: {(datetime.datetime.now() - relativedelta.relativedelta(months=-1)).strftime('%Y-%m-01')} as default.",
+            description = f"The end date provided in UTC-0 YYYY-MM-DD. It must be after the start_time arg. If not specified use: {(datetime.datetime.now() - relativedelta.relativedelta(months=1)).strftime('%Y-%m-01')} as default.",
             examples = [
                 None,
-                "2025-02-01",
-                "2025-03-01",
-                "2025-04-10",
+                f"{(datetime.datetime.now() - relativedelta.relativedelta(months=1)).strftime('%Y-%m-01')}"
             ],
             default = None
         )
@@ -211,10 +207,10 @@ class CDSHistoricNotebookTool(BaseAgentTool):
             'end_time': [
                 lambda **ka: f"Invalid end time: {ka['end_time']}. It should be in the format YYYY-MM-DD."
                     if ka['end_time'] is not None and utils.try_default(lambda: datetime.datetime.strptime(ka['end_time'], "%Y-%m-%d"), None) is None else None,
-                lambda **ka: f"Invalid end time: {ka['end_time']}. It should be in the after the init time."
-                    if ka['start_time'] is not None and ka['end_time'] is not None and utils.try_default(lambda: datetime.datetime.strptime(ka['end_time'], '%Y-%m-%d') < datetime.datetime.strptime(ka['start_time'], '%Y-%m-%d'), False) else None,
-                lambda **ka: f"Invalid end time: {ka['end_time']}. It should be at least in the previous month."
-                    if ka['end_time'] is not None and datetime.datetime.strptime(ka['end_time'], '%Y-%m-%d') > datetime.datetime.now().replace(day=1) else None
+                lambda **ka: f"Invalid end time: {ka['end_time']}. It should be at least one month after the init time."
+                    if ka['start_time'] is not None and ka['end_time'] is not None and utils.try_default(lambda: datetime.datetime.strptime(ka['end_time'], '%Y-%m') <= datetime.datetime.strptime(ka['start_time'], '%Y-%m'), False) else None,
+                lambda **ka: f"Invalid end time: {ka['end_time']}. It should be at least in the previous month with respect to the current date"
+                    if ka['end_time'] is not None and datetime.datetime.strptime(ka['end_time'], '%Y-%m-%d') >= datetime.datetime.now().replace(day=1) else None
             ]
         }
         
