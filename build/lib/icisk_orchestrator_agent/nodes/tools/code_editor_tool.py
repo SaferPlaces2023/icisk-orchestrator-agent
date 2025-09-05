@@ -116,17 +116,15 @@ class CodeEditorTool(BaseAgentTool):
         else:
             generated_code = self.output['generated_code']
             add_source_code(generated_code)
+            
+        # DOC: Back to a consisent state
+        self.output_confirmed = False
                         
         return {
             "notebook": source,
             "generated_code" : generated_code
         }
         
-    
-    # DOC: Back to a consisent state
-    def _on_tool_end(self):
-        self.execution_confirmed = True
-        self.output_confirmed = False       
     
     
     # DOC: Try running AgentTool → Will check required, validity and inference over arguments thatn call and return _execute()

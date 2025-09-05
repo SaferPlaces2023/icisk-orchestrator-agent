@@ -62,16 +62,20 @@ class SPIHistoricNotebookTool(BaseAgentTool):
             description = f"The start datetime provided in UTC-0 YYYY-MM-DD. If not specified use {(datetime.datetime.now() - relativedelta.relativedelta(months=2)).strftime('%Y-%m-01')} as default.",
             examples = [
                 None,
-                f"{(datetime.datetime.now() - relativedelta.relativedelta(months=2)).strftime('%Y-%m-01')}"
+                "2025-01-01",
+                "2025-02-01",
+                "2025-03-10",
             ],
             default = None
         )
         end_time: None | str = Field(
             title = "End Time",
-            description = f"The end date provided in UTC-0 YYYY-MM-DD. It must be after the start_time arg. If not specified use: {(datetime.datetime.now() - relativedelta.relativedelta(months=1)).strftime('%Y-%m-01')} as default.",
+            description = f"The end date provided in UTC-0 YYYY-MM-DD. It must be after the start_time arg. If not specified use: {(datetime.datetime.now() - relativedelta.relativedelta(months=-1)).strftime('%Y-%m-01')} as default.",
             examples = [
                 None,
-                f"{(datetime.datetime.now() - relativedelta.relativedelta(months=1)).strftime('%Y-%m-01')}"
+                "2025-02-01",
+                "2025-03-01",
+                "2025-04-10",
             ],
             default = None
         )
@@ -157,12 +161,12 @@ class SPIHistoricNotebookTool(BaseAgentTool):
         
         def infer_start_time(**ka):
             if ka['start_time'] is None:
-                return (datetime.datetime.now() - relativedelta.relativedelta(months=2)).strftime('%Y-%m-01')
+                return (datetime.datetime.now().date() - relativedelta.relativedelta(month=2)).strftime('%Y-%m-01')
             return ka['start_time']
         
         def infer_end_time(**ka):
             if ka['end_time'] is None:
-                return (datetime.datetime.now() - relativedelta.relativedelta(months=1)).strftime('%Y-%m-01')
+                return (datetime.datetime.now().date() - relativedelta.relativedelta(month=1)).strftime('%Y-%m-01')
             return ka['end_time']
         
         def infer_jupyter_notebook(**ka):
@@ -217,12 +221,6 @@ class SPIHistoricNotebookTool(BaseAgentTool):
             "notebook": jupyter_notebook
         }
         
-    
-    # DOC: Back to a consisent state
-    def _on_tool_end(self):
-        self.execution_confirmed = False
-        self.output_confirmed = True       
-    
     
     # DOC: Try running AgentTool → Will check required, validity and inference over arguments thatn call and return _execute()
     def _run(

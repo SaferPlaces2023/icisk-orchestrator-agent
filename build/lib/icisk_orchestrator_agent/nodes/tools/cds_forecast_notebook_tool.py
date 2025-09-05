@@ -100,19 +100,23 @@ class CDSForecastNotebookTool(BaseAgentTool):
         )
         init_time: None | str = Field(
             title = "Initialization Time",
-            description = f"The date of the forecast initialization provided in UTC-0 YYYY-MM-DD. It represent the start time of the requested data. If not specified use {datetime.datetime.now().replace(day=1).strftime('%Y-%m-%d')} as default.",
+            description = f"The date of the forecast initialization provided in UTC-0 YYYY-MM-DD. If not specified use {datetime.datetime.now().replace(day=1).strftime('%Y-%m-%d')} as default.",
             examples = [
                 None,
-                f"{datetime.datetime.now().replace(day=1).strftime('%Y-%m-%d')}"
+                "2025-01-01",
+                "2025-02-01",
+                "2025-03-10",
             ],
             default = None
         )
         lead_time: None | str = Field(
             title = "Lead Time",
-            description = f"The end date of the forecast provided in UTC-0 YYYY-MM-DD. It represent the end time of the requested data. It must be after the init_time arg. If not specified use: {(datetime.datetime.now().replace(day=1) + relativedelta.relativedelta(month=1)).strftime('%Y-%m-%d')} as default.",
+            description = f"The end date of the forecast provided in UTC-0 YYYY-MM-DD. It must be after the init_time arg. If not specified use: {(datetime.datetime.now().replace(day=1) + relativedelta.relativedelta(month=1)).strftime('%Y-%m-%d')} as default.",
             examples = [
                 None,
-                f"{(datetime.datetime.now().replace(day=1) + relativedelta.relativedelta(month=1)).strftime('%Y-%m-%d')}"
+                "2025-02-01",
+                "2025-03-01",
+                "2025-04-10",
             ],
             default = None
         )
@@ -184,8 +188,8 @@ class CDSForecastNotebookTool(BaseAgentTool):
             'lead_time': [
                 lambda **ka: f"Invalid lead time: {ka['lead_time']}. It should be in the format YYYY-MM-DD."
                     if ka['lead_time'] is not None and utils.try_default(lambda: datetime.datetime.strptime(ka['lead_time'], "%Y-%m-%d"), None) is None else None,
-                lambda **ka: f"Invalid lead time: {ka['lead_time']}. It should be at least one month after the init time."
-                    if ka['init_time'] is not None and ka['lead_time'] is not None and utils.try_default(lambda: datetime.datetime.strptime(ka['lead_time'], '%Y-%m') <= datetime.datetime.strptime(ka['init_time'], '%Y-%m'), False) else None,
+                lambda **ka: f"Invalid lead time: {ka['lead_time']}. It should be in the after the init time."
+                    if ka['init_time'] is not None and ka['lead_time'] is not None and utils.try_default(lambda: datetime.datetime.strptime(ka['lead_time'], '%Y-%m-%d') < datetime.datetime.strptime(ka['init_time'], '%Y-%m-%d'), False) else None,
                 lambda **ka: f"Invalid lead time: {ka['lead_time']}. It should be no more than 6 months in the future."
                     if ka['lead_time'] is not None and \
                         self.InputForecastVariable.glofas not in [self.InputForecastVariable.from_str(v) for v in ka['forecast_variables']] and \
@@ -338,12 +342,6 @@ class CDSForecastNotebookTool(BaseAgentTool):
             "data_source": zarr_output,
             "notebook": jupyter_notebook,
         }
-        
-    
-    # DOC: Back to a consisent state
-    def _on_tool_end(self):
-        self.execution_confirmed = False
-        self.output_confirmed = True   
         
     
     # DOC: Try running AgentTool → Will check required, validity and inference over arguments thatn call and return _execute()

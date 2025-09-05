@@ -60,23 +60,19 @@ class SPIForecastNotebookTool(BaseAgentTool):
         )
         init_time: None | str = Field(
             title = "Initialization Time",
-            description = f"The date of the forecast initialization provided in UTC-0 YYYY-MM-DD. If not specified use {datetime.datetime.now().strftime('%Y-%m-01')} as default.",
+            description = f"The date of the forecast initialization provided in UTC-0 YYYY-MM-DD. It represent the start time of the requested interest period data. If not specified use {datetime.datetime.now().replace(day=1).strftime('%Y-%m-%d')} as default.",
             examples = [
                 None,
-                "2025-01-01",
-                "2025-02-01",
-                "2025-03-10",
+                f"{datetime.datetime.now().replace(day=1).strftime('%Y-%m-%d')}"
             ],
             default = None
         )
         lead_time: None | str = Field(
             title = "Lead Time",
-            description = f"The end date of the forecast lead time provided in UTC-0 YYYY-MM-DD. It must be after the init_time arg. If not specified use: {(datetime.datetime.now().date().replace(day=1) + datetime.timedelta(days=31)).strftime('%Y-%m-01')} as default.",
+            description = f"The end date of the forecast lead time provided in UTC-0 YYYY-MM-DD. It represent the end time of the requested interest period data. It must be after the init_time arg. If not specified use: {(datetime.datetime.now().replace(day=1) + relativedelta.relativedelta(month=1)).strftime('%Y-%m-%d')} as default.",
             examples = [
                 None,
-                "2025-02-01",
-                "2025-03-01",
-                "2025-04-10",
+                f"{(datetime.datetime.now().replace(day=1) + relativedelta.relativedelta(month=1)).strftime('%Y-%m-%d')}"
             ],
             default = None
         )
@@ -162,12 +158,12 @@ class SPIForecastNotebookTool(BaseAgentTool):
         
         def infer_init_time(**ka):
             if ka['init_time'] is None:
-                return datetime.datetime.now().strftime('%Y-%m-01')
+                return datetime.datetime.now().replace(day=1).strftime('%Y-%m-%d')
             return ka['init_time']
         
         def infer_lead_time(**ka):
             if ka['lead_time'] is None:
-                return (datetime.datetime.now().date().replace(day=1) + relativedelta.relativedelta(month=1)).strftime('%Y-%m-01')
+                return (datetime.datetime.now().replace(day=1) + relativedelta.relativedelta(month=1)).strftime('%Y-%m-%d')
             return ka['lead_time']
         
         def infer_jupyter_notebook(**ka):
@@ -221,6 +217,12 @@ class SPIForecastNotebookTool(BaseAgentTool):
         return {
             "notebook": jupyter_notebook
         }
+        
+    
+    # DOC: Back to a consisent state
+    def _on_tool_end(self):
+        self.execution_confirmed = False
+        self.output_confirmed = True   
         
     
     # DOC: Try running AgentTool → Will check required, validity and inference over arguments thatn call and return _execute()

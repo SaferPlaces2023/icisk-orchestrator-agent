@@ -107,16 +107,16 @@ notebook_template.cells.extend([
             factor = 10 ** decimals
             return math.ceil(number * factor) / factor
             
-        spi_start_date = init_time - relativedelta(months=spi_ts-1)
-        spi_years_range = list(range(spi_start_date.year, lead_time.year+1))
+        spi_start_date = start_time - relativedelta(months=spi_ts-1)
+        spi_years_range = list(range(spi_start_date.year, end_time.year+1))
         spi_month_range = []
         for iy,year in enumerate(range(spi_years_range[0], spi_years_range[-1]+1)):
             if iy==0 and len(spi_years_range)==1:
-                spi_month_range.append([month for month in range(spi_start_date.month, lead_time.month+1)])
+                spi_month_range.append([month for month in range(spi_start_date.month, end_time.month+1)])
             elif iy==0 and len(spi_years_range)>1:
                 spi_month_range.append([month for month in range(spi_start_date.month, 13)])
             elif iy>0 and iy==len(spi_years_range)-1:
-                spi_month_range.append([month for month in range(1, lead_time.month+1)])
+                spi_month_range.append([month for month in range(1, end_time.month+1)])
             else:
                 spi_month_range.append([month for month in range(1, 13)])
 
@@ -166,15 +166,14 @@ notebook_template.cells.extend([
         # Preprocess period-of-interest dataset
         cds_poi_data = cds_poi_data.drop_vars(['number', 'expver'])
         cds_poi_data = cds_poi_data.rename({'valid_time': 'time', 'latitude': 'lat', 'longitude': 'lon'})
-        cds_poi_data = cds_poi_data.resample(time='1ME').sum()                                      # Resample to monthly total data
-        cds_poi_data = cds_poi_data.assign_coords(time=cds_poi_data.time.dt.strftime('%Y-%m-01'))   # Set month day to 01
-        cds_poi_data = cds_poi_data.assign_coords(time=pd.to_datetime(cds_poi_data.time))
-        cds_poi_data['tp'] = cds_poi_data['tp'] / 12                                                # Convert total precipitation to monthly average precipitation
+        cds_poi_data['time'] = pd.date_range(start=f"{cds_poi_data.time[0].dt.date.item().strftime('%Y-%m-%d')}T01:00:00", periods=len(cds_poi_data.time), freq='h')
+        cds_poi_data = cds_poi_data.sel(time=cds_poi_data.time.dt.hour == 0).resample(time='1ME').sum()
         cds_poi_data = cds_poi_data.assign_coords(
+            time = cds_poi_data.time.to_series().apply(lambda dt: datetime.datetime(dt.year, dt.month, 1)),
             lat=np.round(cds_poi_data.lat.values, 6),
             lon=np.round(cds_poi_data.lon.values, 6),
         )
-        cds_poi_data = cds_poi_data.sortby(['time', 'lat', 'lon'])
+        cds_poi_data = cds_poi_data.sortby(["time", "lat", "lon"])
 
         # Get whole dataset
         ts_dataset = xr.concat([cds_ref_data, cds_poi_data], dim='time')
