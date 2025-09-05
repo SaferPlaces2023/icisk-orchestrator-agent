@@ -250,13 +250,13 @@ notebook_template.cells.extend([
             ranges = collection_data['ranges']
             
             time_axis = {{
-                'seasonal-original-single-levels': 'time',
-                'cems-glofas-seasonal': 'forecast_period'
+                'seasonal-original-single-levels': 't',
+                'cems-glofas-seasonal': 't'
             }}[dataset_name]
 
             dims = {{
                 'model': list(map(int, [p.split('_')[1] for p in params])),
-                'time': pd.date_range(axes[time_axis]['start'], axes[time_axis]['stop'], axes[time_axis]['num']),
+                'time': [datetime.datetime.fromisoformat(dt) for dt in axes[time_axis]['values']],
                 'lon': np.linspace(axes['x']['start'], axes['x']['stop'], axes['x']['num'], endpoint=True),
                 'lat': np.linspace(axes['y']['start'], axes['y']['stop'], axes['y']['num'], endpoint=True)
             }}

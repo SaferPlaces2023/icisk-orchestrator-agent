@@ -100,7 +100,7 @@ class CDSForecastNotebookTool(BaseAgentTool):
         )
         init_time: None | str = Field(
             title = "Initialization Time",
-            description = f"The date of the forecast initialization provided in UTC-0 YYYY-MM-DD. If not specified use {datetime.datetime.now().replace(day=1).strftime('%Y-%m-%d')} as default.",
+            description = f"The date of the forecast initialization provided in UTC-0 YYYY-MM-DD. It represent the start time of the requested data. If not specified use {datetime.datetime.now().replace(day=1).strftime('%Y-%m-%d')} as default.",
             examples = [
                 None,
                 f"{datetime.datetime.now().replace(day=1).strftime('%Y-%m-%d')}"
@@ -109,7 +109,7 @@ class CDSForecastNotebookTool(BaseAgentTool):
         )
         lead_time: None | str = Field(
             title = "Lead Time",
-            description = f"The end date of the forecast provided in UTC-0 YYYY-MM-DD. It must be after the init_time arg. If not specified use: {(datetime.datetime.now().replace(day=1) + relativedelta.relativedelta(month=1)).strftime('%Y-%m-%d')} as default.",
+            description = f"The end date of the forecast provided in UTC-0 YYYY-MM-DD. It represent the end time of the requested data. It must be after the init_time arg. If not specified use: {(datetime.datetime.now().replace(day=1) + relativedelta.relativedelta(month=1)).strftime('%Y-%m-%d')} as default.",
             examples = [
                 None,
                 f"{(datetime.datetime.now().replace(day=1) + relativedelta.relativedelta(month=1)).strftime('%Y-%m-%d')}"
