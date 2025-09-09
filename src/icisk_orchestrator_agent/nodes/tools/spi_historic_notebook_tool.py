@@ -158,11 +158,15 @@ class SPIHistoricNotebookTool(BaseAgentTool):
         def infer_start_time(**ka):
             if ka['start_time'] is None:
                 return (datetime.datetime.now() - relativedelta.relativedelta(months=2)).strftime('%Y-%m-01')
+            elif ka['end_time'] is not None and ka['start_time'] > ka['end_time']:
+                ka['start_time'] = ka['end_time']
             return ka['start_time']
         
         def infer_end_time(**ka):
             if ka['end_time'] is None:
                 return (datetime.datetime.now() - relativedelta.relativedelta(months=1)).strftime('%Y-%m-01')
+            elif ka['start_time'] is not None and ka['end_time'] < ka['start_time']:
+                ka['end_time'] = ka['start_time']
             return ka['end_time']
         
         def infer_jupyter_notebook(**ka):

@@ -159,11 +159,15 @@ class SPIForecastNotebookTool(BaseAgentTool):
         def infer_init_time(**ka):
             if ka['init_time'] is None:
                 return datetime.datetime.now().replace(day=1).strftime('%Y-%m-%d')
+            elif ka['lead_time'] is not None and ka['init_time'] > ka['lead_time']:
+                ka['init_time'] = ka['lead_time']
             return ka['init_time']
         
         def infer_lead_time(**ka):
             if ka['lead_time'] is None:
                 return (datetime.datetime.now().replace(day=1) + relativedelta.relativedelta(month=1)).strftime('%Y-%m-%d')
+            elif ka['init_time'] is not None and ka['lead_time'] < ka['init_time']:
+                ka['lead_time'] = ka['init_time']
             return ka['lead_time']
         
         def infer_jupyter_notebook(**ka):
