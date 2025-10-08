@@ -89,7 +89,7 @@ notebook_template.cells.extend([
                         ],
                         "data_format": "netcdf",
                     },
-                    "token": "YOUR-ICISK-API-TOKEN",
+                    "token": getpass.getpass("YOUR ICISK_INGESTOR_API_TOKEN"),
                     "zarr_out": f"s3://saferplaces.co/test/icisk/ai-agent/{zarr_output.replace('.zarr', f'-{fc_var}')}.zarr",
                 }
             }

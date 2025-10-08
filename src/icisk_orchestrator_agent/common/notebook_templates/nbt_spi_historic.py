@@ -217,7 +217,7 @@ notebook_template.cells.extend([
 
             t = lambda Hx: math.sqrt(
                 math.log(1 /
-                (math.pow(Hx, 2) if 0<Hx<=0.5 else math.pow(1-Hx, 2))
+                max((math.pow(Hx, 2) if 0<Hx<=0.5 else math.pow(1-Hx, 2)), 1e-6)
             ))
 
             c0, c1, c2 = 2.515517, 0.802853, 0.010328
